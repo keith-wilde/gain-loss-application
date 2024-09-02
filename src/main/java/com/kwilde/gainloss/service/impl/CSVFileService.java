@@ -7,10 +7,13 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,38 +26,26 @@ import static com.kwilde.gainloss.file.PortfolioFileHeaders.*;
 public class CSVFileService implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(CSVFileService.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("M/d/yyyy");
+    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withHeader(PortfolioFileHeaders.class).withSkipHeaderRecord();
 
-//   TODO  @value for file location?
+
+    @Value("${portfolio.default-file}")
+    private String defaultFilePath;
 
     @Override
-    public List findAll() {
+    public List parseAll() {
 
-        CSVFormat csvFormat = CSVFormat.DEFAULT.withHeader(PortfolioFileHeaders.class).withSkipHeaderRecord();
         List<PortfolioRecord> portfolioRecordList = new ArrayList<>();
 
         Reader in;
         try {
-            in = new FileReader(ResourceUtils.getFile("classpath:data.csv"));
-            Iterable<CSVRecord> records = csvFormat.parse(in);
+            in = new FileReader(ResourceUtils.getFile(defaultFilePath));
+            Iterable<CSVRecord> records = CSV_FORMAT.parse(in);
 
             //NOTE: assuming csv values are valid and populated
             for (CSVRecord record : records) {
-                PortfolioRecord portfolioRecord = new PortfolioRecord();
-
-                portfolioRecord.setPortfolioName(record.get(PORTFOLIO));
-                portfolioRecord.setTicker(record.get(TICKER));
-                portfolioRecord.setDate(LocalDate.parse(record.get(DATE), FORMATTER));
-                portfolioRecord.setOpenPrice(new BigDecimal(record.get(OPEN)));
-                portfolioRecord.setHighPrice(new BigDecimal(record.get(HIGH)));
-                portfolioRecord.setLowPrice(new BigDecimal(record.get(LOW)));
-                portfolioRecord.setClosePrice(new BigDecimal(record.get(CLOSE)));
-                portfolioRecord.setAdjustedClosePrice(new BigDecimal(record.get(ADJUSTED_CLOSE)));
-                portfolioRecord.setVolume(Long.valueOf(record.get(VOLUME)));
-                portfolioRecord.setQuantity(new BigDecimal(record.get(QUANTITY)));
-                portfolioRecord.setMarketValue(new BigDecimal(record.get(MARKET_VALUE)));
-
+                PortfolioRecord portfolioRecord = populatePortfolioRecord(record);
                 portfolioRecordList.add(portfolioRecord);
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -65,18 +56,45 @@ public class CSVFileService implements FileService {
         return portfolioRecordList;
 
     }
-        @Override
-    public List findByFileName(String name) {
-        return null;
-    }
 
     @Override
-    public boolean uploadFile(PortfolioRecord o) {
-        return false;
+    public List<PortfolioRecord> parseByFileName(String name) {
+        List<PortfolioRecord> portfolioRecordList = new ArrayList<>();
+
+        Reader in;
+        try {
+            in = new FileReader(ResourceUtils.getFile(name));
+            Iterable<CSVRecord> records = CSV_FORMAT.parse(in);
+
+            //NOTE: assuming csv values are valid and populated
+            for (CSVRecord record : records) {
+                PortfolioRecord portfolioRecord = populatePortfolioRecord(record);
+                portfolioRecordList.add(portfolioRecord);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        logger.info("Processed {} records", portfolioRecordList.size());
+
+        return portfolioRecordList;
     }
 
-    @Override
-    public boolean uploadFiles(List<PortfolioRecord> list) {
-        return false;
+    private static PortfolioRecord populatePortfolioRecord(CSVRecord record) {
+        PortfolioRecord portfolioRecord = new PortfolioRecord();
+
+        portfolioRecord.setPortfolioName(record.get(PORTFOLIO));
+        portfolioRecord.setTicker(record.get(TICKER));
+        portfolioRecord.setDate(LocalDate.parse(record.get(DATE), FORMATTER));
+        portfolioRecord.setOpenPrice(new BigDecimal(record.get(OPEN)));
+        portfolioRecord.setHighPrice(new BigDecimal(record.get(HIGH)));
+        portfolioRecord.setLowPrice(new BigDecimal(record.get(LOW)));
+        portfolioRecord.setClosePrice(new BigDecimal(record.get(CLOSE)));
+        portfolioRecord.setAdjustedClosePrice(new BigDecimal(record.get(ADJUSTED_CLOSE)));
+        portfolioRecord.setVolume(Long.valueOf(record.get(VOLUME)));
+        portfolioRecord.setQuantity(new BigDecimal(record.get(QUANTITY)));
+        portfolioRecord.setMarketValue(new BigDecimal(record.get(MARKET_VALUE)));
+        return portfolioRecord;
     }
+
 }

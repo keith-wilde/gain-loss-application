@@ -8,6 +8,8 @@ public interface PortfolioService {
 
     boolean importData();
 
+    boolean importFromFile(String fileName);
+
     List<PortfolioRecord> findAll();
 
 }

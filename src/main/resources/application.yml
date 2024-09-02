@@ -1,3 +1,5 @@
 spring:
   profiles:
     active: local
+portfolio:
+  default-file: classpath:data.csv

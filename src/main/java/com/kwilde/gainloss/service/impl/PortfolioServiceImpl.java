@@ -25,9 +25,22 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public boolean importData() {
-        List<PortfolioRecord> portfolioRecordList = fileService.findAll();
+        List<PortfolioRecord> portfolioRecordList = fileService.parseAll();
         if(CollectionUtils.isEmpty(portfolioRecordList)){
             logger.info("No portfolio records found");
+            return false;
+        }
+
+        portfolioRecordRepository.saveAll(portfolioRecordList);
+
+        return true;
+    }
+
+    @Override
+    public boolean importFromFile(String fileName) {
+        List<PortfolioRecord> portfolioRecordList = fileService.parseByFileName(fileName);
+        if(CollectionUtils.isEmpty(portfolioRecordList)){
+            logger.info("No portfolio records found for file {}", fileName);
             return false;
         }
 

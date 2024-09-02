@@ -5,7 +5,7 @@ Using Java and SQL develop a small program that reads in `Gain Loss Portfolio Sa
 Gain/Loss is defined as the difference in “Market Value” amounts between two time periods. `Gain/Loss = (New Value – Old Value) / Old Value`. The Portfolio value per day is the sum of contributing ticker “Market Value” amounts for each portfolio for that day.
 
 Include some endpoints that:
-- Display per ticker per portfolio Gain/Loss from the latest versus its prior time period. - group by query? 
+- Display per ticker per portfolio Gain/Loss from the latest versus its prior time period.  
 - Display per ticker Gain/Loss from the oldest to the latest time period.
 - Roll up Portfolio level Gain/Loss for both “the latest versus its prior time period” and “oldest to the latest time period”.
 - Rank tickers within a Portfolio in order of total gain/loss.

@@ -6,11 +6,9 @@ import java.util.List;
 
 public interface FileService {
 
-    List<PortfolioRecord> findAll();
+    List<PortfolioRecord> parseAll();
 
-    List<PortfolioRecord> findByFileName(String name);
+    List<PortfolioRecord> parseByFileName(String name);
 
-    boolean uploadFile(PortfolioRecord portFolioRecord);
 
-    boolean uploadFiles(List<PortfolioRecord> portFolioRecords);
 }
