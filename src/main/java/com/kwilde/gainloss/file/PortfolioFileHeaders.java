@@ -14,7 +14,7 @@ public enum PortfolioFileHeaders {
     QUANTITY("Quantity"),
     MARKET_VALUE("Market Value");
 
-    private String title;
+    private final String title;
     PortfolioFileHeaders(String header) {
         this.title = header;
     }

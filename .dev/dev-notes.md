@@ -1,13 +1,8 @@
 (Keep general plan/notes in here)
 
-CSV, not excel
 
 
-
-3.   , , do real service impl - include basic unit tests? 
-
-4. Implement individual repo methods based on requirements
- - maybe need native queries for some cases?
+Implement endpoint logic in services
 
 5. Extras if have time - 
 tests that import their own data? - example of real database connection is staging config? 
