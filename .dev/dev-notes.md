@@ -1,14 +1,13 @@
 (Keep general plan/notes in here)
 
-1. Create controller(s), service, dao classes (maybe initially without including db)
- - Just get basic Spring part running 
-
-2. Get importing of excel into dto objects working.
+CSV, not excel
+2. Get importing of csv into dto objects working.
 (Probably use POI library?)
+ - Get file import converted into java objects 1st
  - Import on application start or through endpoint? 
-   - To start with, check if table empty before doing import on app startup
+   - To start with, check if table empty before doing import on app startup?
 
-3. Include database (H2 for now?), setup entities, repos, do real service impl - include basic unit tests? 
+3.   entities, repos, do real service impl - include basic unit tests? 
 
 4. Implement individual repo methods based on requirements
  - maybe need native queries for some cases?

@@ -1,10 +1,16 @@
 package com.kwilde.gainloss.service;
 
+import com.kwilde.gainloss.entity.PortfolioRecord;
+
 import java.util.List;
 
-public interface FileService<PortFolioRecord> {
+public interface FileService {
 
-    List<PortFolioRecord> findAll();
+    List<PortfolioRecord> findAll();
 
-    List<PortFolioRecord> findByFileName(String name);
+    List<PortfolioRecord> findByFileName(String name);
+
+    boolean uploadFile(PortfolioRecord portFolioRecord);
+
+    boolean uploadFiles(List<PortfolioRecord> portFolioRecords);
 }
