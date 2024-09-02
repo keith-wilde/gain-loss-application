@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.StringJoiner;
 
 
 @Entity
@@ -130,5 +131,24 @@ public class PortfolioRecord {
 
     public void setMarketValue(BigDecimal marketValue) {
         this.marketValue = marketValue;
+    }
+
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PortfolioRecord.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("portfolioName='" + portfolioName + "'")
+                .add("ticker='" + ticker + "'")
+                .add("date=" + date)
+                .add("openPrice=" + openPrice)
+                .add("highPrice=" + highPrice)
+                .add("lowPrice=" + lowPrice)
+                .add("closePrice=" + closePrice)
+                .add("adjustedClosePrice=" + adjustedClosePrice)
+                .add("volume=" + volume)
+                .add("quantity=" + quantity)
+                .add("marketValue=" + marketValue)
+                .toString();
     }
 }
