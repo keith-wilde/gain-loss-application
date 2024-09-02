@@ -13,7 +13,7 @@ public class PortfolioRecord {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String portFolioName;
+    private String portfolioName;
 
     private String ticker;
 
@@ -44,12 +44,12 @@ public class PortfolioRecord {
         this.id = id;
     }
 
-    public String getPortFolioName() {
-        return portFolioName;
+    public String getPortfolioName() {
+        return portfolioName;
     }
 
-    public void setPortFolioName(String portFolioName) {
-        this.portFolioName = portFolioName;
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
     }
 
     public String getTicker() {
