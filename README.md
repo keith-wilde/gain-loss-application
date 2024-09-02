@@ -24,21 +24,3 @@ To submit please push the code to a **private** github repository and add add al
 **Github Users** to add as collaborators to your private Github repo: alphatheory-dzalika, alphatheory-adahan, alphatheory-ccarneiro
 
 
-IDeas
-
-PortfolioRecord (as entity?)
-
-Have endpoint "import" to import excel sheet
-
-BigDecimals
-docker compose
-postgres and spring 
-have excel in project, copy into spring image
-Maybe have a folder where if anything in it, gets run at startup, otherwise runs only on import from other folder
-
-Data part
-
-group by dates? 
-
-POI - for excel
-
