@@ -8,6 +8,7 @@ import java.util.StringJoiner;
 
 
 @Entity
+@Table(name = "portfolio")
 public class PortfolioRecord {
 
     @Id

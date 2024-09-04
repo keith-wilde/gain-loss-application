@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS PORTFOLIO;
 
 CREATE TABLE PORTFOLIO (
     id INT PRIMARY KEY,
-    name varchar(255) not null,
+    portfolio_name varchar(255) not null,
     ticker varchar(5) not null,
     date date not null,
     open_price DECIMAL(19,4) not null,

@@ -2,9 +2,17 @@
 
 
 
-Implement endpoint logic in services
+Next: 
+Convert tuples returned from repository into dto objects, 
 
-5. Extras if have time - 
+
+
+Finish 4/5 endpoints
+
+endpoint 4 - do similar to 3 except instead of summing tickers, return full object and sort them
+endpoint 5 - 
+
+Extras if have time - 
 tests that import their own data? - example of real database connection is staging config? 
 endpoint that does import 
 Use docker compose with spring and postgres containers. 

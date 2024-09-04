@@ -3,21 +3,29 @@ package com.kwilde.gainloss.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class TickerResponse {
+public class TickerGainLoss {
 
-    private String name;
+    private String portfolioName;
+    private String ticker;
     private LocalDate date;
     private BigDecimal gainLoss;
 
-
     public String getName() {
-        return name;
+        return ticker;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.ticker = name;
     }
 
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
+    }
 
     public LocalDate getDate() {
         return date;
