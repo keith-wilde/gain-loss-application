@@ -1,14 +1,20 @@
 package com.kwilde.gainloss.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class TickerGainLoss {
 
     private String portfolioName;
     private String ticker;
-    private LocalDate date;
     private BigDecimal gainLoss;
+
+    public TickerGainLoss() {}
+
+    public TickerGainLoss(String portfolioName, String ticker, BigDecimal gainLoss) {
+        this.portfolioName = portfolioName;
+        this.ticker = ticker;
+        this.gainLoss = gainLoss;
+    }
 
     public String getName() {
         return ticker;
@@ -25,14 +31,6 @@ public class TickerGainLoss {
 
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
 
     public BigDecimal getGainLoss() {

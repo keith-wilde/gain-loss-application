@@ -1,17 +1,16 @@
 package com.kwilde.gainloss.controller;
 
-import com.kwilde.gainloss.entity.PortfolioRecord;
-import com.kwilde.gainloss.repository.PortfolioRepository;
+import com.kwilde.gainloss.dto.PortfolioGainLoss;
+import com.kwilde.gainloss.dto.TickerGainLoss;
 import com.kwilde.gainloss.service.PortfolioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/portfolio")
@@ -19,22 +18,14 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    @Autowired// TODO, remove temporary
-    PortfolioRepository portfolioRepository;
-
     public PortfolioController(PortfolioService portfolioService) {
         this.portfolioService = portfolioService;
     }
 
-    @GetMapping("/all") // TODO, remove temporary
-    public ResponseEntity<List<PortfolioRecord>> loadData(){
-        return ResponseEntity.ok(portfolioService.findAll());
-    }
-
     @GetMapping("/run/import")
-    public ResponseEntity<Boolean> importData(){
+    public ResponseEntity<Boolean> importData() {
 
-        if(portfolioService.importData()) {
+        if (portfolioService.importData()) {
             return ResponseEntity.ok(true);
         } else {
             return ResponseEntity.ok(false);
@@ -42,49 +33,41 @@ public class PortfolioController {
     }
 
     @GetMapping("/ticker/latest-vs-previous")
-    public ResponseEntity findLatestVsPreviousTickers(){
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<TickerGainLoss>> findLatestVsPreviousTickers() {
+        return ResponseEntity.ok(portfolioService.getLatestVsPreviousTickers());
     }
 
     @GetMapping("/ticker/latest-vs-oldest")
-    public ResponseEntity findLatestVsOldestTickers(){
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<TickerGainLoss>> findLatestVsOldestTickers() {
+        return ResponseEntity.ok(portfolioService.getLatestVsOldestTickers());
     }
 
     @GetMapping("/latest-vs-previous")
-    public ResponseEntity findLatestVsPreviousPortfolios(){
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<PortfolioGainLoss>> findLatestVsPreviousPortfolios() {
+        return ResponseEntity.ok(portfolioService.getLatestVsPreviousPortfolios());
     }
 
     @GetMapping("/latest-vs-oldest")
-    public ResponseEntity findLatestVsOldestPortfolios(){
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<PortfolioGainLoss>> findLatestVsOldestPortfolios() {
+        return ResponseEntity.ok(portfolioService.getLatestVsOldestPortfolios());
     }
 
+    /**
+     * @param portfolio - if multiple words, use underscore
+     * @return List<TickerGainLoss>
+     */
     @GetMapping("/{portfolio}/tickers/rank")
-    public ResponseEntity findRankOfTickersForPortfolio(@PathVariable String portfolio){
+    public ResponseEntity<List<TickerGainLoss>> findRankOfTickersForPortfolio(@PathVariable String portfolio) {
 
-        return ResponseEntity.ok().build();
+        portfolio = portfolio.replace("_", " ");
+
+        return ResponseEntity.ok(portfolioService.rankTickersWithinPortfolio(portfolio));
     }
 
     @GetMapping("/best-performance")
-    public ResponseEntity findBestPerformingPortfolio(){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PortfolioGainLoss> findBestPerformingPortfolio() {
+        Optional<PortfolioGainLoss> portfolioGainLossOptional = portfolioService.findBestPerformingPortfolio();
+        return ResponseEntity.ok(portfolioGainLossOptional.orElse(new PortfolioGainLoss()));
     }
 
-
-    @GetMapping("/run/test") // TODO, remove. temporary
-    public ResponseEntity test(){
-        return ResponseEntity.ok(portfolioRepository
-                .findPortfolioGainLossByDate("Fund One", LocalDate.of(2020,10,19), LocalDate.of(2020, 11, 02)));
-    }
-
-    @GetMapping("/run/test2") // TODO, remove. temporary
-    public ResponseEntity test2(){
-//        return ResponseEntity.ok(portfolioRecordRepository
-//                .findTickerGainLossByDate(LocalDate.of(2020,10,19), LocalDate.of(2020, 11, 02)));
-
-        return ResponseEntity.ok(portfolioService.getLatestVsPreviousPortfolios());
-    }
 }

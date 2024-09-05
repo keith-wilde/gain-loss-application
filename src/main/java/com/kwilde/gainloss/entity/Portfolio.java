@@ -9,7 +9,7 @@ import java.util.StringJoiner;
 
 @Entity
 @Table(name = "portfolio")
-public class PortfolioRecord {
+public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -137,7 +137,7 @@ public class PortfolioRecord {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", PortfolioRecord.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", Portfolio.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
                 .add("portfolioName='" + portfolioName + "'")
                 .add("ticker='" + ticker + "'")

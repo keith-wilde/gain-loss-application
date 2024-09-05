@@ -10,6 +10,7 @@ public class CSVFileServiceTest {
 
     /**
      * Use nested to be able to group tests by functionality. In this case by method
+     *
      */
     @Nested
     class ImportData {
@@ -22,5 +23,25 @@ public class CSVFileServiceTest {
         void Should_Handle_Missing_File(){
             assertFalse(false);
         }
+
+//        ... other edge cases
     }
+
+    @Nested
+    class ParseByFileName {
+
+        @Test
+        void Should_Parse_File_Successfully() {
+
+        }
+
+        @Test
+        void Should_Handle_Invalid_Filename() {
+
+        }
+
+    }
+
+
+
 }

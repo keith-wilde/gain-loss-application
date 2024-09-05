@@ -1,14 +1,13 @@
 package com.kwilde.gainloss.service;
 
-import com.kwilde.gainloss.entity.PortfolioRecord;
+import com.kwilde.gainloss.entity.Portfolio;
 
 import java.util.List;
 
 public interface FileService {
 
-    List<PortfolioRecord> parseAll();
+    List<Portfolio> parseAll();
 
-    List<PortfolioRecord> parseByFileName(String name);
-
+    List<Portfolio> parseByFileName(String name);
 
 }

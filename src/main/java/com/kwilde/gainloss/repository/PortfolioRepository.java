@@ -1,6 +1,6 @@
 package com.kwilde.gainloss.repository;
 
-import com.kwilde.gainloss.entity.PortfolioRecord;
+import com.kwilde.gainloss.entity.Portfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface PortfolioRepository extends JpaRepository<PortfolioRecord, Long> {
+public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     @Query(value =  "select max(date) " +
                     "from portfolio", nativeQuery = true)
@@ -29,7 +29,7 @@ public interface PortfolioRepository extends JpaRepository<PortfolioRecord, Long
             "where p1.date = :startDate ", nativeQuery = true)
     List<Object[]> findTickerGainLossByDate(@Param("startDate") LocalDate startDate, @Param("endDate")  LocalDate endDate);
 
-    @Query(value = "select p1.portfolio_name, p1.ticker, p1.date, ((p1.market_value - p2.market_value) / p2.market_value) as  \"GainLoss\" " +
+    @Query(value = "select p1.portfolio_name, p1.ticker, ((p1.market_value - p2.market_value) / p2.market_value) as  \"GainLoss\" " +
             "from portfolio p1\n" +
             "join portfolio p2 on (p1.ticker = p2.ticker and p2.date = :endDate) and (p1.portfolio_name = :portfolio_name) " +
             "where p1.date = :startDate and p1.portfolio_name = p2.portfolio_name ", nativeQuery = true)

@@ -1,9 +1,10 @@
 package com.kwilde.gainloss.service;
 
 import com.kwilde.gainloss.dto.PortfolioGainLoss;
-import com.kwilde.gainloss.entity.PortfolioRecord;
+import com.kwilde.gainloss.dto.TickerGainLoss;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PortfolioService {
 
@@ -11,13 +12,16 @@ public interface PortfolioService {
 
     boolean importFromFile(String fileName);
 
-    List<PortfolioRecord> findAll();
+    List<TickerGainLoss> getLatestVsPreviousTickers();
 
-    List<Object[]> getLatestVsPreviousTickers();
-    List<Object[]> getLatestVsOldestTickers();
+    List<TickerGainLoss> getLatestVsOldestTickers();
+
+    List<TickerGainLoss> rankTickersWithinPortfolio(String name);
 
     List<PortfolioGainLoss> getLatestVsPreviousPortfolios();
+
     List<PortfolioGainLoss> getLatestVsOldestPortfolios();
 
+    Optional<PortfolioGainLoss> findBestPerformingPortfolio();
 
 }

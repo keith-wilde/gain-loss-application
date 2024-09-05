@@ -1,6 +1,6 @@
 package com.kwilde.gainloss.service.impl;
 
-import com.kwilde.gainloss.entity.PortfolioRecord;
+import com.kwilde.gainloss.entity.Portfolio;
 import com.kwilde.gainloss.file.PortfolioFileHeaders;
 import com.kwilde.gainloss.service.FileService;
 import org.apache.commons.csv.CSVFormat;
@@ -33,9 +33,9 @@ public class CSVFileService implements FileService {
     private String defaultFilePath;
 
     @Override
-    public List parseAll() {
+    public List<Portfolio> parseAll() {
 
-        List<PortfolioRecord> portfolioRecordList = new ArrayList<>();
+        List<Portfolio> portfolioList = new ArrayList<>();
 
         Reader in;
         try {
@@ -44,22 +44,21 @@ public class CSVFileService implements FileService {
 
             //NOTE: assuming csv values are valid and populated
             for (CSVRecord record : records) {
-                PortfolioRecord portfolioRecord = populatePortfolioRecord(record);
-                portfolioRecordList.add(portfolioRecord);
+                Portfolio portfolio = populatePortfolioRecord(record);
+                portfolioList.add(portfolio);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        logger.info("Processed {} records", portfolioRecordList.size());
+        logger.info("Processed {} records", portfolioList.size());
 
-        return portfolioRecordList;
-
+        return portfolioList;
     }
 
     @Override
-    public List<PortfolioRecord> parseByFileName(String name) {
-        List<PortfolioRecord> portfolioRecordList = new ArrayList<>();
+    public List<Portfolio> parseByFileName(String name) {
+        List<Portfolio> portfolioList = new ArrayList<>();
 
         Reader in;
         try {
@@ -68,33 +67,33 @@ public class CSVFileService implements FileService {
 
             //NOTE: assuming csv values are valid and populated
             for (CSVRecord record : records) {
-                PortfolioRecord portfolioRecord = populatePortfolioRecord(record);
-                portfolioRecordList.add(portfolioRecord);
+                Portfolio portfolio = populatePortfolioRecord(record);
+                portfolioList.add(portfolio);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        logger.info("Processed {} records", portfolioRecordList.size());
+        logger.info("Processed {} records", portfolioList.size());
 
-        return portfolioRecordList;
+        return portfolioList;
     }
 
-    private static PortfolioRecord populatePortfolioRecord(CSVRecord record) {
-        PortfolioRecord portfolioRecord = new PortfolioRecord();
+    private static Portfolio populatePortfolioRecord(CSVRecord record) {
+        Portfolio portfolio = new Portfolio();
 
-        portfolioRecord.setPortfolioName(record.get(PORTFOLIO));
-        portfolioRecord.setTicker(record.get(TICKER));
-        portfolioRecord.setDate(LocalDate.parse(record.get(DATE), FORMATTER));
-        portfolioRecord.setOpenPrice(new BigDecimal(record.get(OPEN)));
-        portfolioRecord.setHighPrice(new BigDecimal(record.get(HIGH)));
-        portfolioRecord.setLowPrice(new BigDecimal(record.get(LOW)));
-        portfolioRecord.setClosePrice(new BigDecimal(record.get(CLOSE)));
-        portfolioRecord.setAdjustedClosePrice(new BigDecimal(record.get(ADJUSTED_CLOSE)));
-        portfolioRecord.setVolume(Long.valueOf(record.get(VOLUME)));
-        portfolioRecord.setQuantity(new BigDecimal(record.get(QUANTITY)));
-        portfolioRecord.setMarketValue(new BigDecimal(record.get(MARKET_VALUE)));
-        return portfolioRecord;
+        portfolio.setPortfolioName(record.get(PORTFOLIO));
+        portfolio.setTicker(record.get(TICKER));
+        portfolio.setDate(LocalDate.parse(record.get(DATE), FORMATTER));
+        portfolio.setOpenPrice(new BigDecimal(record.get(OPEN)));
+        portfolio.setHighPrice(new BigDecimal(record.get(HIGH)));
+        portfolio.setLowPrice(new BigDecimal(record.get(LOW)));
+        portfolio.setClosePrice(new BigDecimal(record.get(CLOSE)));
+        portfolio.setAdjustedClosePrice(new BigDecimal(record.get(ADJUSTED_CLOSE)));
+        portfolio.setVolume(Long.valueOf(record.get(VOLUME)));
+        portfolio.setQuantity(new BigDecimal(record.get(QUANTITY)));
+        portfolio.setMarketValue(new BigDecimal(record.get(MARKET_VALUE)));
+        return portfolio;
     }
 
 }

@@ -1,7 +1,8 @@
 package com.kwilde.gainloss.service.impl;
 
 import com.kwilde.gainloss.dto.PortfolioGainLoss;
-import com.kwilde.gainloss.entity.PortfolioRecord;
+import com.kwilde.gainloss.dto.TickerGainLoss;
+import com.kwilde.gainloss.entity.Portfolio;
 import com.kwilde.gainloss.repository.PortfolioRepository;
 import com.kwilde.gainloss.service.FileService;
 import com.kwilde.gainloss.service.PortfolioService;
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+
+import static com.kwilde.gainloss.util.ObjectUtils.convertToBigDecimal;
 
 @Service
 public class PortfolioServiceImpl implements PortfolioService {
@@ -28,50 +32,64 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public boolean importData() {
-        List<PortfolioRecord> portfolioRecordList = fileService.parseAll();
-        if(CollectionUtils.isEmpty(portfolioRecordList)){
+        List<Portfolio> portfolioList = fileService.parseAll();
+        if (CollectionUtils.isEmpty(portfolioList)) {
             logger.info("No portfolio records found");
             return false;
         }
 
-        portfolioRepository.saveAll(portfolioRecordList);
+        portfolioRepository.saveAll(portfolioList);
 
         return true;
     }
 
     @Override
     public boolean importFromFile(String fileName) {
-        List<PortfolioRecord> portfolioRecordList = fileService.parseByFileName(fileName);
-        if(CollectionUtils.isEmpty(portfolioRecordList)){
+        List<Portfolio> portfolioList = fileService.parseByFileName(fileName);
+        if (CollectionUtils.isEmpty(portfolioList)) {
             logger.info("No portfolio records found for file {}", fileName);
             return false;
         }
 
-        portfolioRepository.saveAll(portfolioRecordList);
+        portfolioRepository.saveAll(portfolioList);
 
         return true;
     }
 
     @Override
-    public List<PortfolioRecord> findAll() {
-        return portfolioRepository.findAll();
-    }
-
-    @Override
-    public List<Object[]> getLatestVsPreviousTickers() {
+    public List<TickerGainLoss> getLatestVsPreviousTickers() {
         LocalDate latestTickerDate = portfolioRepository.findLatestDate();
-        Objects.requireNonNull(latestTickerDate);
+        Objects.requireNonNull(latestTickerDate, "Latest ticker date not found");
         LocalDate previousTickerDate = latestTickerDate.minusWeeks(1);
 
-        return portfolioRepository.findTickerGainLossByDate(previousTickerDate, latestTickerDate);
+        List<Object[]> tickerObjectList = portfolioRepository.findTickerGainLossByDate(previousTickerDate, latestTickerDate);
+
+        return convertObjectsToTickers(tickerObjectList);
     }
 
     @Override
-    public List<Object[]> getLatestVsOldestTickers() {
-        return portfolioRepository.findTickerGainLossByDate(
+    public List<TickerGainLoss> getLatestVsOldestTickers() {
+        List<Object[]> tickerObjectList = portfolioRepository.findTickerGainLossByDate(
                 Objects.requireNonNull(portfolioRepository.findEarliestDate()),
                 Objects.requireNonNull(portfolioRepository.findLatestDate())
         );
+
+        return convertObjectsToTickers(tickerObjectList);
+    }
+
+    @Override
+    public List<TickerGainLoss> rankTickersWithinPortfolio(String name) {
+        Objects.requireNonNull(name, "Portfolio name cannot be empty");
+
+        List<Object[]> tickerObjectList = portfolioRepository.findPortfolioGainLossByDate(
+                name,
+                Objects.requireNonNull(portfolioRepository.findEarliestDate()),
+                Objects.requireNonNull(portfolioRepository.findLatestDate())
+        );
+
+        List<TickerGainLoss> tickerGainLosses = convertObjectsToTickers(tickerObjectList);
+
+        return rankTickers(tickerGainLosses);
     }
 
     @Override
@@ -81,24 +99,24 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         List<PortfolioGainLoss> portfolioGainLosses = new ArrayList<>();
 
-        if(ObjectUtils.isEmpty(portfolioNames)){
+        if (ObjectUtils.isEmpty(portfolioNames)) {
             logger.info("No Portfolio names found");
             return new ArrayList<>();
         }
 
         LocalDate latestDate = Objects.requireNonNull(portfolioRepository.findLatestDate());
 
-        for(String name: portfolioNames){
+        for (String name : portfolioNames) {
             List<Object[]> tickerObjectList = portfolioRepository.findPortfolioGainLossByDate(
                     name,
                     latestDate.minusWeeks(1),
                     latestDate
             );
 
-            if(!CollectionUtils.isEmpty(tickerObjectList)){
+            if (!CollectionUtils.isEmpty(tickerObjectList)) {
                 PortfolioGainLoss portfolioGainLoss = new PortfolioGainLoss();
                 portfolioGainLoss.setName(name);
-                // sum up ticker gain/losses
+                portfolioGainLoss.setOverallGainloss(sumTickers(tickerObjectList));
                 portfolioGainLosses.add(portfolioGainLoss);
             }
         }
@@ -106,7 +124,6 @@ public class PortfolioServiceImpl implements PortfolioService {
         return portfolioGainLosses;
     }
 
-    //TODO, put common logic into private method
     @Override
     public List<PortfolioGainLoss> getLatestVsOldestPortfolios() {
 
@@ -114,29 +131,76 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         List<PortfolioGainLoss> portfolioGainLosses = new ArrayList<>();
 
-        if(ObjectUtils.isEmpty(portfolioNames)){
+        if (ObjectUtils.isEmpty(portfolioNames)) {
             logger.info("No Portfolio names found");
             return new ArrayList<>();
         }
 
-        for(String name: portfolioNames){
+        for (String name : portfolioNames) {
             List<Object[]> tickerObjectList = portfolioRepository.findPortfolioGainLossByDate(
                     name,
                     Objects.requireNonNull(portfolioRepository.findEarliestDate()),
                     Objects.requireNonNull(portfolioRepository.findLatestDate())
             );
 
-            if(!CollectionUtils.isEmpty(tickerObjectList)){
+            if (!CollectionUtils.isEmpty(tickerObjectList)) {
                 PortfolioGainLoss portfolioGainLoss = new PortfolioGainLoss();
                 portfolioGainLoss.setName(name);
-                // todo sum up ticker gain/losses
-
+                portfolioGainLoss.setOverallGainloss(sumTickers(tickerObjectList));
                 portfolioGainLosses.add(portfolioGainLoss);
             }
+        }
+        return portfolioGainLosses;
+    }
+
+    @Override
+    public Optional<PortfolioGainLoss> findBestPerformingPortfolio() {
+
+        List<PortfolioGainLoss> portfolioGainLosses = getLatestVsOldestPortfolios();
+
+        if (CollectionUtils.isEmpty(portfolioGainLosses)) {
+            return Optional.empty();
+        }
+
+        return portfolioGainLosses.stream()
+                .max(Comparator.comparing(PortfolioGainLoss::getOverallGainloss));
+    }
+
+    private BigDecimal sumTickers(List<Object[]> tickers) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (Object[] ticker : tickers) {
+            total = total.add(convertToBigDecimal(ticker[2]));
+        }
+
+        return total;
+    }
+
+    private List<TickerGainLoss> convertObjectsToTickers(List<Object[]> tickerObjectList) {
+        List<TickerGainLoss> tickerGainLosses = new ArrayList<>();
+        if (CollectionUtils.isEmpty(tickerObjectList)) {
+            logger.info("No tickers found");
+        }
+
+        for (Object[] ticker : tickerObjectList) {
+            tickerGainLosses.add(
+                    new TickerGainLoss(
+                            String.valueOf(ticker[0]),
+                            String.valueOf(ticker[1]),
+                            convertToBigDecimal(ticker[2])
+                    )
+            );
 
         }
 
+        return tickerGainLosses;
 
-        return portfolioGainLosses;
     }
+
+    private List<TickerGainLoss> rankTickers(List<TickerGainLoss> tickerGainLosses) {
+        return tickerGainLosses.stream()
+                .sorted((tickerGainLoss1, tickerGainLoss2)
+                        -> tickerGainLoss2.getGainLoss().compareTo(tickerGainLoss1.getGainLoss()))
+                .toList();
+    }
+
 }
